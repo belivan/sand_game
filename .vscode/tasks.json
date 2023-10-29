@@ -11,12 +11,15 @@
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe",
                 "fssimplewindow.cpp",
+                "yssimplesound.cpp",
                 "-lgdi32",
                 "-lopengl32",
                 "-lglu32",
                 "-luser32",
                 "-lkernel32",
                 "-limm32",
+                "-ldsound",
+                "-luuid"
             ],
             "options": {
                 "cwd": "${fileDirname}"
