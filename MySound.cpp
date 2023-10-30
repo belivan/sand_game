@@ -55,7 +55,9 @@ void MySound::drawSoundWave()
     int x_current = static_cast<int>((currentPos / static_cast<double>(wav.GetNumSample() / wav.GetNumChannel())) * wid);
 
     int y_offset = wav.GetSignedValue16(0, currentPos);
-    y_offset = static_cast<int>(y_offset * (axis / 1.5) / 32767.0);
+    y_offset = static_cast<int>(y_offset * (axis / 2) / 32767.0);
+
+    double scalingFactor = static_cast<double>(wid) / (wav.GetNumSamplePerChannel() * wav.GetNumChannel() * 200);
 
     glColor4f(0.5, 0.0, 0.0, 0.1);
     glLineWidth(1.0);
@@ -63,7 +65,7 @@ void MySound::drawSoundWave()
 
     for (long long int x = 0; x < wid; ++x)
     {
-        long long int ptr = currentPos + static_cast<long long int>((x-wid/2) * wav.GetNumSamplePerChannel() / (wid * 540));
+        long long int ptr = currentPos - static_cast<long long int>((x-wid/2) * wav.GetNumSamplePerChannel() * scalingFactor);
 
         // Ensure ptr is within valid range
         ptr = std::max(0LL, std::min(ptr, static_cast<long long int>(wav.GetNumSamplePerChannel() - 1)));
