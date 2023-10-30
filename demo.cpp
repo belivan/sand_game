@@ -57,13 +57,13 @@ int main(void)
         
         if (MODE == "AUTO")
         {
-            if ((!autoModeActive && (elapsedTime - lastAutoExecution >= 5000)) || (elapsedTime >= 30000 && elapsedTime <=32000))
+            if ((!autoModeActive && (elapsedTime - lastAutoExecution >= 8000)) || (elapsedTime >= 30000 && elapsedTime <=32000))
             {
                 // Transition from inactive to active
                 autoModeActive = true;
                 lastAutoExecution = elapsedTime;
             }
-            else if (autoModeActive && (elapsedTime - lastAutoExecution >= 5000) )
+            else if (autoModeActive && (elapsedTime - lastAutoExecution >= 8000) )
             {
                 // Transition from active to inactive
                 autoModeActive = false;

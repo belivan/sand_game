@@ -95,8 +95,8 @@ void MySound::loadWavFile()
     // std::cout << "Enter Wav File Name:";
     // std::getline(std::cin,fileName);
 
-    //while(YSOK!=wav.LoadWav(fileName.c_str()))
     while(YSOK!=wav.LoadWav("disfigure.wav"))
+    //while(YSOK!=wav.LoadWav(fileName.c_str()))
     {
         std::cout << "Failed to read %s\n";
         std::cout << "Enter Wav File Name:";
