@@ -14,7 +14,7 @@
 
 std::string MODE = "AUTO"; // change to "AUTO" or "MANUAL"
 
-int DEMO_TIME = 60; // in seconds
+int DEMO_TIME = 145; // in seconds
 
 int lastAutoExecution = 0;
 bool autoModeActive = false;
@@ -23,7 +23,7 @@ int main(void)
 {
     FsPassedTime();
 
-    FsOpenWindow(0,0,800,600,1);
+    FsOpenWindow(0,0,1024,768,1);
     int wid,hei;
     FsGetWindowSize(wid,hei);
     glViewport(0,0,wid,hei);
@@ -57,13 +57,13 @@ int main(void)
         
         if (MODE == "AUTO")
         {
-            if (!autoModeActive && (elapsedTime - lastAutoExecution >= 5000))
+            if ((!autoModeActive && (elapsedTime - lastAutoExecution >= 5000)) || (elapsedTime >= 30000 && elapsedTime <=32000))
             {
                 // Transition from inactive to active
                 autoModeActive = true;
                 lastAutoExecution = elapsedTime;
             }
-            else if (autoModeActive && (elapsedTime - lastAutoExecution >= 5000))
+            else if (autoModeActive && (elapsedTime - lastAutoExecution >= 5000) )
             {
                 // Transition from active to inactive
                 autoModeActive = false;
@@ -96,17 +96,17 @@ int main(void)
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, 800, 600, 0, -1, 1);
+        glOrtho(0, 1024,768, 0, -1, 1);
 
         grid.update(sound);
 
         grid.background();
-        //sound.drawSoundWaveBase();
         sound.drawSoundWave();
+        sound.drawSoundWaveBase();
         grid.render();
 
         FsSwapBuffers();
-        FsSleep(20);
+        FsSleep(30);
     }
     return 0;
 }

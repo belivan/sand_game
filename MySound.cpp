@@ -11,10 +11,10 @@ MySound::MySound()
     playWavFile();
 }
 
-void MySound::drawSoundWaveBase() //would be nice if worked
+void MySound::drawSoundWaveBase()
 {
-    int wid,hei;
-    FsGetWindowSize(wid,hei);
+    int wid, hei;
+    FsGetWindowSize(wid, hei);
     int axis = hei / 2;
 
     auto currentTime = player.GetCurrentPosition(wav);
@@ -23,23 +23,34 @@ void MySound::drawSoundWaveBase() //would be nice if worked
     int y = wav.GetSignedValue16(0, currentPos);
     y = axis - static_cast<int>(y * (axis / 2.0) / 32767.0);
 
-    glColor4f(1.0, 0.0, 0.0, 0.2);
-    glBegin(GL_LINES);
-    glVertex2i(x, 0);
-    glVertex2i(x, hei);
-    glEnd();
-    
-    glColor4f(1.0, 0.0, 0.0, 0.2);
-    glLineWidth(1.0);
-    glBegin(GL_LINE_STRIP);
-
-    for(long long int x = 0; x < wid; ++x)
+    int min_y = axis, max_y = axis;
+    for (long long int x = 0; x < wid; ++x)
     {
         long long int ptr = x * wav.GetNumSamplePerChannel() / wid;
         int y = wav.GetSignedValue16(0, ptr);
-        y = axis - static_cast<int>(y * (axis / 2.0) / 32767.0);
+        y = axis - static_cast<int>(y * (axis / 5.0) / 32767.0);
+        min_y = std::min(min_y, y);
+        max_y = std::max(max_y, y);
+    }
+
+    glColor4f(0.8, 0.0, 0.0, 0.2);
+    glLineWidth(1.0);
+    glBegin(GL_LINE_STRIP);
+
+    for (long long int x = 0; x < wid; ++x)
+    {
+        long long int ptr = x * wav.GetNumSamplePerChannel() / wid;
+        int y = wav.GetSignedValue16(0, ptr);
+        y = axis - static_cast<int>(y * (axis / 5.0) / 32767.0);
         glVertex2i(x, y);
     }
+    glEnd();
+
+    glColor4f(0.0, 0.75, 0.0, 0.2);
+    glLineWidth(3.0);
+    glBegin(GL_LINES);
+    glVertex2i(x, min_y);
+    glVertex2i(x, max_y);
     glEnd();
 }
 
@@ -81,10 +92,11 @@ void MySound::drawSoundWave()
 void MySound::loadWavFile()
 {
     FsChangeToProgramDir();
-    std::cout << "Enter Wav File Name:";
-    std::getline(std::cin,fileName);
+    // std::cout << "Enter Wav File Name:";
+    // std::getline(std::cin,fileName);
 
-    while(YSOK!=wav.LoadWav(fileName.c_str()))
+    //while(YSOK!=wav.LoadWav(fileName.c_str()))
+    while(YSOK!=wav.LoadWav("disfigure.wav"))
     {
         std::cout << "Failed to read %s\n";
         std::cout << "Enter Wav File Name:";

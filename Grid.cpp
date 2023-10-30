@@ -7,8 +7,8 @@
 #include "fssimplewindow.h"
 
 Grid::Grid() : lastActivityTime(0.0), PARTICLE_COUNT(0){ //change if needed and remove
-    GRID_WIDTH = 800 / PIXELS_PER_GRID_CELL;
-    GRID_HEIGHT = 600 / PIXELS_PER_GRID_CELL;
+    GRID_WIDTH = 1024 / PIXELS_PER_GRID_CELL;
+    GRID_HEIGHT = 768 / PIXELS_PER_GRID_CELL;
 
     grid = new Particle[GRID_WIDTH*GRID_HEIGHT];
     for(int i = 0; i < GRID_WIDTH*GRID_HEIGHT; ++i) {
