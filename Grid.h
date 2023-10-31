@@ -3,6 +3,7 @@
 
 #include "Particle.h"
 #include "MySound.h"
+#include "Physics.h"
 
 class Grid {
     private:
@@ -11,17 +12,16 @@ class Grid {
         const int MAX_PARTICLES_FACTOR = 15; // 1/n of grid size
         int GRID_WIDTH;
         int GRID_HEIGHT;
-        const float VX_DAMP_FACTOR = 0.9; //edit if needed
+    
         Particle* grid;
-        const float gravity = 9.81f;  // gravity constant
-        const float timeConstant = 0.3f; //time constant
+        Physics physics;
+        
         const int PIXELS_PER_GRID_CELL = 4;
         const int BLOB_SIZE = 10;
 
         //sound variables
         const double MAX_DISTANCE = 200.0;
         const double MAX_Y = 32767.0;
-        const double K_FORCE = 30; //edit if needed
 
         //activity variables
         double lastActivityTime;

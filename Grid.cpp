@@ -3,8 +3,8 @@
 #include <limits>
 #include <math.h>
 #include <iostream>
-#include <GL/gl.h>
 #include "fssimplewindow.h"
+#include "Physics.h"
 
 Grid::Grid() : lastActivityTime(0.0), PARTICLE_COUNT(0){ //change if needed and remove
     GRID_WIDTH = 1024 / PIXELS_PER_GRID_CELL;
@@ -83,17 +83,9 @@ void Grid::update(MySound& sound)
             {
                 double soundY = sound.getYNormal(x);
 
-                double force = K_FORCE*(soundY);
-
-                // Update velocity based on force
-                currentParticle.vy -= force;
-
-                //Apply damping to horizontal velocity and do Euler's for Vx and Vy
-                currentParticle.vx *= VX_DAMP_FACTOR;
-                int X_NEXT = x + static_cast<int>(currentParticle.vx * timeConstant);
-
-                currentParticle.vy += gravity * timeConstant;
-                int Y_NEXT = y + static_cast<int>(currentParticle.vy * timeConstant);
+                std::pair<int, int> nextXY = physics.calculateNextPositions(currentParticle, x, y, soundY);
+                int X_NEXT = nextXY.first;
+                int Y_NEXT = nextXY.second;
 
                 // if (x % (GRID_WIDTH*GRID_HEIGHT/1000) == 0) {
                 //     std::cout << "Information for x = " << x << ": " << std::endl;

@@ -1,5 +1,6 @@
 #include "Grid.h"
 #include "MySound.h"
+#include "Physics.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -27,6 +28,7 @@ class Game {
 
         MySound sound;
         Grid grid;
+        Physics physics;
 
         std::string MODE;
         bool DEMO;

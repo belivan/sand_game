@@ -2,16 +2,16 @@
 #define PHYSICS_H
 
 #include <utility>
-
-class Particle {
-public:
-    double vx;
-    double vy;
-};
+#include "Particle.h"
 
 class Physics {
-public:
-    static std::pair<int, int> calculateNextPositions(Particle& currentParticle, int x, int y, double soundY, double K_FORCE, double VX_DAMP_FACTOR, double timeConstant, double gravity);
+    private:
+        static const double K_FORCE; //edit if needed
+        static const float VX_DAMP_FACTOR; //edit if needed
+        static const float gravity;  // gravity constant
+        static const float timeConstant; //time constant
+    public:
+        static std::pair<int, int> calculateNextPositions(Particle& currentParticle, int x, int y, double soundY);
 };
 
 #endif

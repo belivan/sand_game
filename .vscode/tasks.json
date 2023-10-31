@@ -16,6 +16,7 @@
                 "Particle.cpp",
                 "MySound.cpp",
                 "Game.cpp",
+                "Physics.cpp",
                 "-lgdi32",
                 "-lopengl32",
                 "-lglu32",
