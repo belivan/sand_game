@@ -20,9 +20,3 @@ int main(void)
     Game game(MODE, DEMO, DEMO_TIME);
     return 0;
 }
-
-//Things to add:
-// 1. Add percent full bar
-// 2. Add difficulty level
-// 3. Add title screen
-// 4. Add instructions
