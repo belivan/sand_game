@@ -204,7 +204,7 @@ void Grid::createSand(int mx, int my, int intensity, bool intensity_flag, bool u
 }
 
 int Grid::getParticleCount() {
-    std::cout << "Particle Count: " << PARTICLE_COUNT << std::endl;
+    // std::cout << "Particle Count: " << PARTICLE_COUNT << std::endl;
     return PARTICLE_COUNT;
 }
 
