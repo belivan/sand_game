@@ -75,26 +75,18 @@ int Grid::getNextMove(int x, int y)
 
 void Grid::update(MySound& sound) 
 {
-    auto currentX = sound.getWavCurrentX();
-    auto currentY = sound.getWavCurrentY();
-
     for (int y = GRID_HEIGHT - 1; y >= 0; --y) {  
         for (int x = 0; x < GRID_WIDTH; ++x) {
             Particle& currentParticle = grid[y*GRID_WIDTH + x];
 
             if(currentParticle.r != 0 || currentParticle.g != 0 || currentParticle.b != 0)
             {
-                // Calculate distance from particle to current x,y position
-                double dx = (int)(currentX / PIXELS_PER_GRID_CELL) - x;
-                double dy = (int)(currentY / PIXELS_PER_GRID_CELL) - y;
-                double dist = sqrt(dx * dx + dy * dy);
+                double soundY = sound.getYNormal(x);
 
-                // Calculate force based on distance and y magnitude of sound wave
-                double force = K_FORCE*(1 - dist / MAX_DISTANCE) * fabs(currentY) / MAX_Y;
+                double force = K_FORCE*(soundY);
 
                 // Update velocity based on force
-                currentParticle.vx += force * dx / dist;
-                currentParticle.vy += force * dy / dist;
+                currentParticle.vy -= force;
 
                 //Apply damping to horizontal velocity and do Euler's for Vx and Vy
                 currentParticle.vx *= VX_DAMP_FACTOR;
@@ -102,6 +94,13 @@ void Grid::update(MySound& sound)
 
                 currentParticle.vy += gravity * timeConstant;
                 int Y_NEXT = y + static_cast<int>(currentParticle.vy * timeConstant);
+
+                // if (x % (GRID_WIDTH*GRID_HEIGHT/1000) == 0) {
+                //     std::cout << "Information for x = " << x << ": " << std::endl;
+                //     std::cout << "Current Y: " << soundY << std::endl;
+                //     std::cout << "Force: " << force << std::endl;
+                //     std::cout << "Velocity Y: " << currentParticle.vy << std::endl;
+                // }
 
                 if(moveParticle(x,y,X_NEXT,Y_NEXT))
                 {
@@ -249,4 +248,13 @@ void Grid::removeExcessParticles() {
             }
         }
     }
+}
+
+int Grid::getParticleCount() {
+    return PARTICLE_COUNT;
+}
+
+int Grid::getMaxParticles()
+{
+    return GRID_WIDTH * GRID_HEIGHT;
 }

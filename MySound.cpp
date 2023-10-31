@@ -54,6 +54,16 @@ void MySound::drawSoundWaveBase()
     glEnd();
 }
 
+double MySound::getMusicTime()
+{
+    return player.GetCurrentPosition(wav);
+}
+
+double MySound::getMusicLength() //edit this one
+{
+    return 0;
+}
+
 void MySound::drawSoundWave()
 {
     int wid, hei;
@@ -61,6 +71,7 @@ void MySound::drawSoundWave()
     int axis = hei / 2;
 
     auto currentTime = player.GetCurrentPosition(wav);
+
     auto currentPos = wav.SecToNumSample(currentTime);
 
     int x_current = static_cast<int>((currentPos / static_cast<double>(wav.GetNumSample() / wav.GetNumChannel())) * wid);
@@ -68,7 +79,7 @@ void MySound::drawSoundWave()
     int y_offset = wav.GetSignedValue16(0, currentPos);
     y_offset = static_cast<int>(y_offset * (axis / 2) / 32767.0);
 
-    double scalingFactor = static_cast<double>(wid) / (wav.GetNumSamplePerChannel() * wav.GetNumChannel() * 200);
+    double scalingFactor = static_cast<double>(wid) / (wav.GetNumSamplePerChannel() * wav.GetNumChannel() * SCALING_FACTOR);
 
     glColor4f(0.5, 0.0, 0.0, 0.1);
     glLineWidth(1.0);
@@ -86,6 +97,24 @@ void MySound::drawSoundWave()
         glVertex2i(x, y);
     }
     glEnd();
+}
+
+double MySound::getYNormal(int x)
+{
+    x = static_cast<long long int>(x);
+
+    int wid, hei;
+    FsGetWindowSize(wid, hei);
+    int axis = hei / 2;
+
+    auto currentTime = player.GetCurrentPosition(wav);
+    auto currentPos = wav.SecToNumSample(currentTime);
+    double scalingFactor = static_cast<double>(wid) / (wav.GetNumSamplePerChannel() * wav.GetNumChannel() * SCALING_FACTOR);
+    long long int ptr = currentPos - static_cast<long long int>((x-wid/2) * wav.GetNumSamplePerChannel() * scalingFactor);
+
+    int y = wav.GetSignedValue16(0, ptr);
+
+    return static_cast<double>(y / 32767.0);
 }
 
 

@@ -21,7 +21,7 @@ class Grid {
         //sound variables
         const double MAX_DISTANCE = 200.0;
         const double MAX_Y = 32767.0;
-        const double K_FORCE = 3; //edit if needed
+        const double K_FORCE = 30; //edit if needed
 
         //activity variables
         double lastActivityTime;
@@ -49,7 +49,8 @@ class Grid {
         return currentTime - lastActivityTime > activityTimeout;
         }
 
-        const int NUM_CLICKS = 3;
+        int getParticleCount();
+        int getMaxParticles();
 };
 
 #endif // GRID_H
