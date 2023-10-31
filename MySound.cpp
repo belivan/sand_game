@@ -1,11 +1,23 @@
 #include "MySound.h"
 
 #include <iostream> 
-#include <GL/gl.h>
+#include <cmath>
 #include "fssimplewindow.h"
 #include "yssimplesound.h"
 
-MySound::MySound()
+MySound::MySound(std::string fileName)
+{
+    this->fileName = fileName;
+    loadWavFile();
+    playWavFile();
+}
+
+MySound::~MySound()
+{
+    player.End();
+}
+
+void MySound::reset()
 {
     loadWavFile();
     playWavFile();
@@ -23,15 +35,7 @@ void MySound::drawSoundWaveBase()
     int y = wav.GetSignedValue16(0, currentPos);
     y = axis - static_cast<int>(y * (axis / 2.0) / 32767.0);
 
-    int min_y = axis, max_y = axis;
-    for (long long int x = 0; x < wid; ++x)
-    {
-        long long int ptr = x * wav.GetNumSamplePerChannel() / wid;
-        int y = wav.GetSignedValue16(0, ptr);
-        y = axis - static_cast<int>(y * (axis / 5.0) / 32767.0);
-        min_y = std::min(min_y, y);
-        max_y = std::max(max_y, y);
-    }
+    int min_y = hei/2-20, max_y = hei/2+20;
 
     glColor4f(0.8, 0.0, 0.0, 0.2);
     glLineWidth(1.0);
@@ -71,11 +75,9 @@ void MySound::drawSoundWave()
     int axis = hei / 2;
 
     auto currentTime = player.GetCurrentPosition(wav);
-
     auto currentPos = wav.SecToNumSample(currentTime);
 
     int x_current = static_cast<int>((currentPos / static_cast<double>(wav.GetNumSample() / wav.GetNumChannel())) * wid);
-
     int y_offset = wav.GetSignedValue16(0, currentPos);
     y_offset = static_cast<int>(y_offset * (axis / 2) / 32767.0);
 
@@ -93,7 +95,7 @@ void MySound::drawSoundWave()
         ptr = std::max(0LL, std::min(ptr, static_cast<long long int>(wav.GetNumSamplePerChannel() - 1)));
 
         int y = wav.GetSignedValue16(0, ptr);
-        y = axis - static_cast<int>(y * (axis / 2) / 32767.0); //- y_offset;
+        y = axis - static_cast<int>(y * (axis/0.8) / 32767.0); //- y_offset;
         glVertex2i(x, y);
     }
     glEnd();
@@ -114,18 +116,28 @@ double MySound::getYNormal(int x)
 
     int y = wav.GetSignedValue16(0, ptr);
 
-    return static_cast<double>(y / 32767.0);
+    return static_cast<double>(y / 32767.0); //between -1 and 1
 }
+
+double MySound::getSoundWaveMagnitude()
+{
+    int wid, hei;
+    FsGetWindowSize(wid, hei);
+    int middleX = wid / 2;
+    return fabs(getYNormal(middleX));
+}
+
 
 
 void MySound::loadWavFile()
 {
     FsChangeToProgramDir();
-    // std::cout << "Enter Wav File Name:";
+
+    //  std::cout << "Enter Wav File Name:";
     // std::getline(std::cin,fileName);
 
-    while(YSOK!=wav.LoadWav("disfigure.wav"))
-    //while(YSOK!=wav.LoadWav(fileName.c_str()))
+    //while(YSOK!=wav.LoadWav("disfigure.wav"))
+    while(YSOK!=wav.LoadWav(fileName.c_str()))
     {
         std::cout << "Failed to read %s\n";
         std::cout << "Enter Wav File Name:";

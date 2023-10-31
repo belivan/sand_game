@@ -7,17 +7,15 @@
 
 class Grid {
     private:
-        int PARTICLE_COUNT;
-        int MAX_PARTICLES;
-        const int MAX_PARTICLES_FACTOR = 15; // 1/n of grid size
-        int GRID_WIDTH;
-        int GRID_HEIGHT;
+        int PARTICLE_COUNT = 0;
+        int GRID_WIDTH = 0;
+        int GRID_HEIGHT = 0;
     
         Particle* grid;
         Physics physics;
         
-        const int PIXELS_PER_GRID_CELL = 4;
-        const int BLOB_SIZE = 10;
+        const int PIXELS_PER_GRID_CELL = 6;
+        int BLOB_SIZE = 10;
 
         //sound variables
         const double MAX_DISTANCE = 200.0;
@@ -31,11 +29,13 @@ class Grid {
     public:
         Grid();
         ~Grid();
+
+        void reset();
+
         void render();
-        void handleMouseClick(int mx, int my);
-        void createBlob(int X, int Y);
-        void removeExcessParticles();
-        void update(MySound& sound);
+        void createSand(int mx, int my, int intensity, bool intensity_flag, bool user);
+        //void removeExcessParticles();
+        void update(MySound& sound, bool vibration_flag);
 
         //functions for particle physics in the grid
         bool isWithinBounds(int x, int y);

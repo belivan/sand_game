@@ -3,6 +3,7 @@
 
 #include <utility>
 #include "Particle.h"
+#include "MySound.h"
 
 class Physics {
     private:
@@ -11,7 +12,11 @@ class Physics {
         static const float gravity;  // gravity constant
         static const float timeConstant; //time constant
     public:
-        static std::pair<int, int> calculateNextPositions(Particle& currentParticle, int x, int y, double soundY);
+        static std::pair<int, int> calculateNextPositions(Particle& currentParticle, int x, int y, MySound& sound);
+        static std::pair<int, int> calculateNextPositions(Particle& currentParticle, int x, int y);
+        void updatePhysics(float xVelocityMultiplier, float yVelocityMultiplier);
+        static float K_X;
+        static float K_Y;
 };
 
 #endif

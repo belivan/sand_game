@@ -13,14 +13,16 @@
 std::string MODE = "AUTO"; // change to "AUTO" or "MANUAL"
 bool DEMO = true; // change to "TRUE" or "FALSE"
 
-int DEMO_TIME = 145; // in seconds
-int AUTO_SPAWN_RATE = 3; // in seconds
-int FORCE_SPAWN_MIN = 30; // in seconds
-int FORCE_SPAWN_MAX = 32; // in seconds
+int DEMO_TIME = 131; // in seconds
 
 int main(void)
 {
-    Game game(MODE, DEMO, DEMO_TIME, AUTO_SPAWN_RATE, FORCE_SPAWN_MIN, FORCE_SPAWN_MAX);
-
+    Game game(MODE, DEMO, DEMO_TIME);
     return 0;
 }
+
+//Things to add:
+// 1. Add percent full bar
+// 2. Add difficulty level
+// 3. Add title screen
+// 4. Add instructions

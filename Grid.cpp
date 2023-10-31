@@ -14,13 +14,20 @@ Grid::Grid() : lastActivityTime(0.0), PARTICLE_COUNT(0){ //change if needed and 
     for(int i = 0; i < GRID_WIDTH*GRID_HEIGHT; ++i) {
         grid[i] = Particle();
     }
-
-    MAX_PARTICLES = GRID_WIDTH * GRID_HEIGHT / MAX_PARTICLES_FACTOR;
 }
 
 
 Grid::~Grid(){
     delete[] grid;
+}
+
+void Grid::reset() {
+    delete[] grid;
+    grid = new Particle[GRID_WIDTH*GRID_HEIGHT];
+    for(int i = 0; i < GRID_WIDTH*GRID_HEIGHT; ++i) {
+        grid[i] = Particle();
+    }
+    PARTICLE_COUNT = 0;
 }
 
 bool Grid::moveParticle(int x, int y, int X_NEXT, int Y_NEXT) {
@@ -73,7 +80,7 @@ int Grid::getNextMove(int x, int y)
     return closestEmptyY;
 }
 
-void Grid::update(MySound& sound) 
+void Grid::update(MySound& sound, bool vibration_flag) 
 {
     for (int y = GRID_HEIGHT - 1; y >= 0; --y) {  
         for (int x = 0; x < GRID_WIDTH; ++x) {
@@ -81,18 +88,18 @@ void Grid::update(MySound& sound)
 
             if(currentParticle.r != 0 || currentParticle.g != 0 || currentParticle.b != 0)
             {
-                double soundY = sound.getYNormal(x);
-
-                std::pair<int, int> nextXY = physics.calculateNextPositions(currentParticle, x, y, soundY);
+                std::pair<int, int> nextXY;
+                if(vibration_flag)
+                {
+                    nextXY = physics.calculateNextPositions(currentParticle, x, y);
+                }
+                else
+                {
+                    nextXY = physics.calculateNextPositions(currentParticle, x, y, sound);
+                }
+                
                 int X_NEXT = nextXY.first;
                 int Y_NEXT = nextXY.second;
-
-                // if (x % (GRID_WIDTH*GRID_HEIGHT/1000) == 0) {
-                //     std::cout << "Information for x = " << x << ": " << std::endl;
-                //     std::cout << "Current Y: " << soundY << std::endl;
-                //     std::cout << "Force: " << force << std::endl;
-                //     std::cout << "Velocity Y: " << currentParticle.vy << std::endl;
-                // }
 
                 if(moveParticle(x,y,X_NEXT,Y_NEXT))
                 {
@@ -135,7 +142,6 @@ void Grid::render() {
 
 void Grid::background()
 {
-    //passedTime = FsPassedTime();
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Draw the color-graded background triangles
@@ -159,46 +165,18 @@ void Grid::background()
         }
     }
     glEnd();
-
-    // auto passedTime = FsPassedTime();
-    // glClear(GL_COLOR_BUFFER_BIT);
-
-    // // Draw the color-graded background triangles
-    // glBegin(GL_TRIANGLES);
-    // for (int x = 0; x < GRID_WIDTH; ++x) {
-    //     for (int y = 0; y < GRID_HEIGHT; ++y) {
-    //         double t = static_cast<double>(x + y) / (GRID_WIDTH + GRID_HEIGHT);
-    //         double r = 0.5 + 0.5 * sin(2 * M_PI * (t + passedTime / 1000.0));
-    //         double g = 0.5 + 0.5 * sin(2 * M_PI * (t + passedTime / 1000.0 + 1.0 / 3.0));
-    //         double b = 0.5 + 0.5 * sin(2 * M_PI * (t + passedTime / 1000.0 + 2.0 / 3.0));
-    //         glColor3d(r, g, b);
-
-    //         int left = x * PIXELS_PER_GRID_CELL;
-    //         int right = (x + 1) * PIXELS_PER_GRID_CELL;
-    //         int top = y * PIXELS_PER_GRID_CELL;
-    //         int bottom = (y + 1) * PIXELS_PER_GRID_CELL;
-
-    //         glVertex2i(left, bottom);
-    //         glVertex2i(right, bottom);
-    //         glVertex2i(left, top);
-
-    //         glVertex2i(left, top);
-    //         glVertex2i(right, top);
-    //         glVertex2i(right, bottom);
-    //     }
-    // }
-    // glEnd();
 }
 
-void Grid::handleMouseClick(int mx, int my)
-{   
+void Grid::createSand(int mx, int my, int intensity, bool intensity_flag, bool user) {
+
     int X = mx / PIXELS_PER_GRID_CELL;
     int Y = my / PIXELS_PER_GRID_CELL;
 
-    createBlob(X, Y);
-}
+    if(intensity_flag)
+    {
+        BLOB_SIZE = intensity; //0-10???
+    }
 
-void Grid::createBlob(int X, int Y) {
     for (int i = -BLOB_SIZE; i <= BLOB_SIZE; ++i) {
         for (int j = -BLOB_SIZE; j <= BLOB_SIZE; ++j) {
             int x = X + i;
@@ -207,42 +185,26 @@ void Grid::createBlob(int X, int Y) {
             if(isWithinBounds(x,y))
             {
                 Particle& p = grid[y*GRID_WIDTH + x];
-                if (p.r != 0 || p.g !=0 || p.b != 0) {
-                    p = Particle();
-                    --PARTICLE_COUNT;
-                }
-                else {
+                if(!user && p.r == 0 && p.g == 0 && p.b == 0) //pc adds sand
+                {
                     p.turnSand();
                     p.vy = static_cast<float>(rand() % 5 + 5) * -1.0f;
                     p.vx = static_cast<float>(rand() % 5 - 2);
                     ++PARTICLE_COUNT;
                 }
-            }
-        }
-    }
-    removeExcessParticles();
-}
 
-void Grid::removeExcessParticles() {
-    while (PARTICLE_COUNT > MAX_PARTICLES) {
-        for (int y = GRID_HEIGHT - 1; y > 0; --y) {  // Start from the bottom row, stop before reaching the top
-            for (int aboveY = y - 1; aboveY >= 0; --aboveY) {
-                for (int x = 0; x < GRID_WIDTH; ++x) {
-                    grid[(aboveY + 1) * GRID_WIDTH + x] = grid[aboveY * GRID_WIDTH + x];
+                if(user && (p.r != 0 || p.g != 0 || p.b != 0)) //user subtracts sand
+                {
+                    p = Particle();
+                    --PARTICLE_COUNT;
                 }
-            }
-            for (int x = 0; x < GRID_WIDTH; ++x) {
-                grid[x] = Particle();
-            }
-            PARTICLE_COUNT -= GRID_WIDTH;
-            if (PARTICLE_COUNT <= MAX_PARTICLES) {
-                break;
             }
         }
     }
 }
 
 int Grid::getParticleCount() {
+    std::cout << "Particle Count: " << PARTICLE_COUNT << std::endl;
     return PARTICLE_COUNT;
 }
 

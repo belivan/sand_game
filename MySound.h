@@ -19,7 +19,8 @@ private:
     void playWavFile();
 
 public:
-    MySound();
+    MySound(std::string fileName);
+    ~MySound();
     int getWavCurrentX();
     int getWavCurrentY();
     void drawSoundWave();
@@ -27,6 +28,9 @@ public:
     double getYNormal(int x);
     double getMusicTime();
     double getMusicLength();
+    void reset();
+    double getSoundWaveMagnitude();
 };
+
 
 #endif // MYSOUND_H
