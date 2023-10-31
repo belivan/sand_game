@@ -1,7 +1,5 @@
 #include "Game.h"
 
-//#include "ysglfontdata.h"
-
 Game::Game(std::string mode, bool demo, int demoTime) {
     MODE = mode;
     DEMO = demo;
@@ -88,6 +86,105 @@ void Game::songSelect(std::string song)
     sound = new MySound(song);
 }
 
+void Game::displayInstructions() 
+{
+    int wid, hei;
+    FsGetWindowSize(wid, hei);
+
+    // Define the instructions
+    std::vector<std::string> instructions = {
+        "SAND SURVIVAL",
+        "INSTRUCTIONS:",
+        "1. Sand will fill up.",
+        "2. Make sure to remove it.",
+        "3. Don't catch the wrong sound 'wave'!",
+        "4. Enjoy :)"
+    };
+
+    // Set the color and position of the text
+    glColor4ub(255, 255, 255,0); 
+
+    // Display each instruction
+    for (int i = 0; i < instructions.size(); i++) {
+        // Calculate the x-coordinate for centering the text
+        int textWidth = (i == 0) ? instructions[i].size() * 20 : instructions[i].size() * 16;
+        int x = (wid - textWidth) / 2;
+
+        glRasterPos2d(x, 100 + i * 30);
+        if (i == 0) {
+            // Use a larger font for the title
+            YsGlDrawFontBitmap20x32(instructions[i].c_str());
+        } else {
+            YsGlDrawFontBitmap16x24(instructions[i].c_str());
+        }
+    }
+    glFlush();
+}
+
+void Game::loadBackgroundImage()
+{
+    FsChangeToProgramDir();
+
+    YsRawPngDecoder png;
+    if(!YSOK==png.Decode("background.png"))
+    {
+       printf("Background Read Error!\n");
+    }
+
+	texId=0;
+
+    glGenTextures(1,&texId);  // Reserve one texture identifier
+    glBindTexture(GL_TEXTURE_2D,texId);  // Making the texture identifier current (or bring it to the deck)
+
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+
+    glTexImage2D
+        (GL_TEXTURE_2D,
+         0,    // Level of detail
+         GL_RGBA,
+         png.wid,
+         png.hei,
+         0,    // Border width, but not supported and needs to be 0.
+         GL_RGBA,
+         GL_UNSIGNED_BYTE,
+         png.rgba);
+}
+
+void Game::displayBackgroundImage() 
+{
+    
+    int wid,hei;
+    FsGetWindowSize(wid,hei);
+
+    glEnable(GL_TEXTURE);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,texId);
+    glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+
+
+    glColor4f(1,1,1,1);
+    glBegin(GL_TRIANGLE_FAN);
+
+    glTexCoord2f(0,0);
+    glVertex2i(0,0);
+
+    glTexCoord2f(1,0);
+    glVertex2i(wid,0);
+
+    glTexCoord2f(1,1);
+    glVertex2i(wid,hei);
+    
+    glTexCoord2f(0,1);
+    glVertex2i(0,hei);
+
+    glEnd();
+
+
+    glDisable(GL_TEXTURE);
+}
 
 void Game::startGame() {
 
@@ -101,13 +198,14 @@ void Game::startGame() {
 
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+    loadBackgroundImage();
+
     srand(time(NULL));
 
     elapsedTime = 0;
 
     while(DEMO == false || (DEMO == true && elapsedTime < DEMO_TIME * 1000))
     {
-
         if(RESET_FLAG == true)
         {
             RESET_FLAG = false;
@@ -119,37 +217,47 @@ void Game::startGame() {
         glLoadIdentity();
         glOrtho(0, 1024, 768, 0, -1, 1);
 
-        sandGenerator();
+        displayBackgroundImage();
+        glDisable(GL_TEXTURE_2D);
 
-        if(MODE == "AUTO")
-        {
-            automatedUser();
-        }
-
-        else if(MODE == "MANUAL")
-        {
-            handleMouseInput();
-        }
-
-        handleMouseInput();
-
-        if(handleKeyboardInput())
-        {
-            break; //end on ESC
-        }
-
-        grid.update(*sound, TURN_OFF_VIBRATION);
-
-        grid.background();
-
+        //grid.background();
         sound->drawSoundWave();
-
         sound->drawSoundWaveBase();
 
-        grid.render();
+        // Display instructions for the first 9 seconds
+        if (elapsedTime < 9000) {
+            displayInstructions();
+        } 
+        else {
+            // Start dropping sand and using automatedUser after 9 seconds
+            sandGenerator();
+
+            if(MODE == "AUTO")
+            {
+                automatedUser();
+            }
+
+            else if(MODE == "MANUAL")
+            {
+                handleMouseInput();
+            }
+
+            handleMouseInput();
+
+            if(handleKeyboardInput())
+            {
+                break; //end on ESC
+            }
+
+            grid.update(*sound, TURN_OFF_VIBRATION);
+            
+            grid.render();
+        }
+
+        //glClear(GL_COLOR_BUFFER_BIT);
+        displayStats();
 
         FsSwapBuffers();
-
         FsSleep(30);
     }
 
@@ -267,7 +375,7 @@ void Game::sandGenerator()
             sandGeneratorActive = true;
 
             float rI = sandGeneratorIntensity * 10; //scaled
-            int roI = std::round(rI); //rounded
+            LEVEL = std::round(rI); //rounded
 
             // std::cout << "Sand generator is active!" << std::endl;
             // std::cout << "INTENSITY LEVEL: " << roI << std::endl;
@@ -296,12 +404,29 @@ void Game::handleMouseInput()
     }
 }
 
+void Game::displayStats()
+{
+    displayMusicTime();
+    displayDifficultyLevel();
+    displayPercentage();
+}
+
 void Game::displayMusicTime() {
-    glColor3ub(255,255,255);
+    //glClear(GL_COLOR_BUFFER_BIT);
+    glColor4ub(255, 255, 255, 0); 
     glRasterPos2d(50,50);
 
-    std::string musicTimeStr = "Music time: " + std::to_string(sound->getMusicTime());
-    //YsGlDrawFontBitmap8x12(musicTimeStr.c_str()); //not available yet
+    int totalSeconds = static_cast<int>(sound->getMusicTime());
+    int minutes = totalSeconds / 60;
+    int seconds = totalSeconds % 60;
+
+    std::ostringstream musicTimeStr;
+    musicTimeStr << std::setw(2) << std::setfill('0') << minutes;
+    musicTimeStr << ":";
+    musicTimeStr << std::setw(2) << std::setfill('0') << seconds;
+
+    YsGlDrawFontBitmap16x24(musicTimeStr.str().c_str());
+    glFlush();
 }
 
 int Game::getPercentSand() {
@@ -311,7 +436,19 @@ int Game::getPercentSand() {
 }
 
 void Game::displayDifficultyLevel() {
-    std::cout << "Difficulty level: " << difficultyLevel << std::endl;
+    int wid, hei;
+    FsGetWindowSize(wid,hei);
+
+    glColor4ub(255, 255, 255, 0); 
+
+    std::string levelStr = "INTENSITY: " + std::to_string(LEVEL);
+    int textWidth = 20 * levelStr.length();
+    int x = (wid - textWidth) / 2;
+
+    glRasterPos2d(x, 50);
+
+    YsGlDrawFontBitmap20x32(levelStr.c_str());
+    glFlush();
 }
 
 void Game::automatedUser()
@@ -349,4 +486,32 @@ void Game::automatedUser()
         INTENSITY_FLAG = true;
         grid.createSand(mx, my, USER_INTENSITY, INTENSITY_FLAG, USER);
     }
+}
+
+void Game::displayPercentage() 
+{
+    int wid, hei;
+    FsGetWindowSize(wid, hei);
+
+    // Calculate the dimensions of the bar
+    int barWidth = 50;
+    int barHeight = static_cast<int>(getPercentSand() * 150 / 100);
+    int barX = wid - barWidth - 50;
+
+    // Draw the bar
+    glColor4f(1.0, 1.0, 1.0, 0.5);
+    glBegin(GL_QUADS);
+    glVertex2i(barX, 50 + 150);
+    glVertex2i(wid-50, 50 + 150);
+    glVertex2i(wid-50, 50 + 150 - barHeight);
+    glVertex2i(barX, 50 + 150 - barHeight);
+    glEnd();
+
+    // Draw the percentage text
+    glColor4ub(255, 255, 255, 0); 
+    glRasterPos2d(wid - 350 / 2, 50);
+
+    std::string percentStr = "FILL: " + std::to_string(static_cast<int>(getPercentSand())) + "%";
+    YsGlDrawFontBitmap16x24(percentStr.c_str());
+    glFlush();
 }

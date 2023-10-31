@@ -7,6 +7,10 @@
 
 #include "yssimplesound.h"
 #include "fssimplewindow.h"
+#include "ysglfontdata.h"
+#include "yspng.h"
+#include "yspngenc.h"
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -15,6 +19,7 @@
 #include <limits>
 #include <random>
 #include <string>
+#include <iomanip>
 
 class Game {
     public:
@@ -34,13 +39,20 @@ class Game {
 
         void automatedUser();
 
+        void displayStats();
+        void displayPercentage();
+        void displayInstructions();
+        void displayBackgroundImage();
+        void loadBackgroundImage();
+
     private:
         int numberOfSandParticles;
-        int difficultyLevel;
+        int LEVEL = 0;
 
         MySound* sound;
         Grid grid;
         Physics physics;
+        GLuint texId;
 
         std::string MODE;
         bool DEMO;
