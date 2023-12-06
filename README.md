@@ -5,14 +5,8 @@ This is an interactive, physics-based simulation game where players manipulate s
 The game combines music, physics, and graphics to create an engaging and dynamic experience. 
 
 ## Features
-Dynamic Sand Simulation: Utilize the basicSandGenerator and sandGenerator functions to create and manipulate sand particles in real-time.
-Music Integration: Choose from a selection of songs (song0 to song4) to play in the background, enhancing the gaming experience.
-Game Modes: Play in different modes (MODE) including a demo mode (DEMO) with customizable time limits (DEMO_TIME).
-User Interaction: Handle mouse and keyboard inputs to interact with the sand particles and control various aspects of the game.
-Statistics Display: Monitor gameplay statistics such as the percentage of sand on the screen and other key metrics.
-Customizable Difficulty: Adjust the difficulty level and intensity of sand particle generation to challenge yourself.
-Background Image Management: Load and display different background images to vary the visual experience.
-Automated Gameplay: Utilize the automatedUser feature for an automatic gameplay experience.
+Dynamic Sand Simulation
+Statistics Display
 
 ## System Requirements
 Compatible with systems running libraries such as yssimplesound, fssimplewindow, ysglfontdata, yspng, and yspngenc.
@@ -24,7 +18,7 @@ Ensure all dependent libraries (Grid.h, MySound.h, Physics.h, etc.) are properly
 Compile the game using a C++ compiler supporting the required libraries.
 
 ## How to Play
-Start the game and select a mode.
+Start the game using demo.cpp and configure the settings as desired.
 Use mouse and keyboard inputs to interact with the sand particles.
 Choose a background song to play during the game.
 Experiment with different sand particle intensities and observe their behavior.
