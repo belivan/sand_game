@@ -16,7 +16,7 @@ Automated Gameplay: Utilize the automatedUser feature for an automatic gameplay 
 
 ## System Requirements
 Compatible with systems running libraries such as yssimplesound, fssimplewindow, ysglfontdata, yspng, and yspngenc.
-Requires C++ standard libraries like <stdio.h>, <time.h>, <stdlib.h>, <math.h>, <iostream>, <limits>, <random>, <string>, and <iomanip>.
+Requires C++ standard libraries like stdio.h, time.h, stdlib.h, math.h, iostream, limits, random, string, and iomanip.
 
 ## Installation
 Clone or download the repository containing the game source files.
