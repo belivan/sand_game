@@ -1,4 +1,4 @@
-# Eng_Comp_Individual_Project
+# Sand Game (Engineering Computations Individual Project)
 
 ## Overview
 This is an interactive, physics-based simulation game where players manipulate sand particles in various environments. 
